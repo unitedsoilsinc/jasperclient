@@ -1,0 +1,26 @@
+{
+  "name": "jasperclient",
+  "version": "1.0.0",
+  "description": "Jasper Server REST API client for publishing and running reports.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:unitedsoilsinc/jasperclient.git"
+  },
+  "author": "Cory Braun <braunc@unitedsoilsinc.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "nock": "^11.7.0"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "axios-cookiejar-support": "^0.5.0",
+    "qs": "^6.9.1",
+    "tough-cookie": "^3.0.1"
+  }
+}
