@@ -27,6 +27,10 @@ let publishResponse = client.reports.publish({
 let runResponse = client.reports.run({
     path: '/Reports/Dummy.pdf',
     format: 'pdf',
+    params: {
+        input1: 'value1',
+        input2: 'value2',
+    },
 },{
     responseType: 'stream',
 });
@@ -37,12 +41,12 @@ runResponse.data.pipe(writer);
 
 writer.on('finish', function () {
     console.log('Successfully wrote file to ./dummy.pdf');
-    logout();
+    client.logout();
 });
 
 writer.on('error', function (err) {
     console.log('Failed to write file: ',err);
-    logout();
+    client.logout();
 });
 ```
 
@@ -114,7 +118,7 @@ writer.on('error', function (err) {
 @param { Object} req - Details about the report you are fetching.
 @param { String} req.path - Path of the report on the Jasper server.
 @param { String} req.format - File extension being requested.
-@param {!Object} req.data - Parameters to apply to the report.
+@param {!Object} req.params - Input controls to apply to the report.
 @param {!Object} opt - Additional options to apply to the Axios request (see https://github.com/axios/axios#request-config ).
 @returns {Promise<Object>} - Resolves an Axios response (see https://github.com/axios/axios#response-schema ).
                            - Rejects an Axios error (see https://github.com/axios/axios#handling-errors ).

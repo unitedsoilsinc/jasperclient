@@ -13,7 +13,7 @@
     * @param { Object} req - Details about the report you are fetching.
     * @param { String} req.path - Path of the report on the Jasper server.
     * @param { String} req.format - File extension being requested.
-    * @param {!Object} req.data - Input controls to apply to the report.
+    * @param {!Object} req.params - Input controls to apply to the report.
     * @param {!Object} opt - Additional options to apply to the Axios request (see https://github.com/axios/axios#request-config ).
     * @returns {Promise<Object>} - Resolves an Axios response (see https://github.com/axios/axios#response-schema ).
     *                            - Rejects an Axios error (see https://github.com/axios/axios#handling-errors ).
@@ -21,7 +21,7 @@
     reports.prototype.run = async function (req,opt) {
         let path = '/rest_v2/reports'+req.path+'.'+req.format;
         try {
-            return await this.client.request('get', path, {}, req.data, opt );
+            return await this.client.request('get', path, req.params, req.data, opt );
         }
         catch (err) {
             throw(err);

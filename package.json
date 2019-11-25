@@ -1,6 +1,6 @@
 {
   "name": "jasperclient",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Jasper Server REST API client for publishing and running reports.",
   "main": "index.js",
   "scripts": {
