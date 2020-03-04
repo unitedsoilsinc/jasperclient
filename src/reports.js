@@ -43,7 +43,7 @@
     */
     reports.prototype.publish = async function (req,opt) {
         try {
-            return await this.client.request('post','/rest_v2/resources'+req.path,
+            return await this.client.request('put','/rest_v2/resources'+req.path,
                 {},
                 Object.assign(
                     {

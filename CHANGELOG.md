@@ -1,5 +1,9 @@
 # jasperclient changes
 
+# 1.1.1 - 2020-03-04
+    - Added example use of resources to the readme
+    - Fixed incorrect publish path introduced in 1.1.0
+
 # 1.1.0 - 2020-03-04
     - Added support for multiple resources per report unit
 

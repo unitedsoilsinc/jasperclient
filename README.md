@@ -15,12 +15,33 @@ let client = new jasperclient({
 });
 
 // Publish a report
-let content = fs.readFileSync('./dummy.jrxml');
 let publishResponse = client.reports.publish({
     path: '/Reports/Dummy',
     label: 'Dummy Report',
     datasource: '/datasources/Dummy',
-    jrxml: Buffer.from(content).toString('base64'),
+    jrxml: Buffer.from(fs.readFileSync('./dummy.jrxml'),'UTF-8').toString('base64'),
+    resources: [
+        {
+            'name': 'img.png',
+            'file': {
+                'fileResource': {
+                    'type': 'img',
+                    'label': 'img.png',
+                    'content': Buffer.from(fs.readFileSync('./img.png')).toString('base64'),
+                },
+            },
+        },
+        {
+            'name': 'sub.jrxml',
+            'file': {
+                'fileResource': {
+                    'type': 'jrxml',
+                    'label': 'sub.jrxml',
+                    'content': Buffer.from(fs.readFileSync('./sub.jrxml'),'UTF-8').toString('base64'),
+                },
+            },
+        }
+    ],
 });
 
 // Fetch a report

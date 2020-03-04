@@ -72,7 +72,7 @@
         */
         publishReport: function () {
             nock('http://example.com')
-                .post('/jasperserver/rest_v2/resources/Reports/Dummy')
+                .put('/jasperserver/rest_v2/resources/Reports/Dummy')
                 .reply( (uri,requestBody) => {
                     return [
                         200,
