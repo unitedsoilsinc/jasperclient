@@ -20,19 +20,33 @@ describe('Publish a report', function () {
             password: 'password',
         });
         
-        try {
-            let content = fs.readFileSync('./test/dummy.jrxml');
-            b64 = Buffer.from(content).toString('base64');
-        }
-        catch (err) {
-            throw(err);
-        }
-        
         response = await client.reports.publish({
             path: '/Reports/Dummy',
             label: 'Dummy Report',
             datasource: '/datasources/Dummy',
-            jrxml: b64,
+            jrxml: Buffer.from(fs.readFileSync('./test/dummy.jrxml'),'UTF-8').toString('base64'),
+            resources: [
+                {
+                    'name': 'img.png',
+                    'file': {
+                        'fileResource': {
+                            'type': 'img',
+                            'label': 'img.png',
+                            'content': Buffer.from(fs.readFileSync('./test/img.png')).toString('base64'),
+                        },
+                    },
+                },
+                {
+                    'name': 'sub.jrxml',
+                    'file': {
+                        'fileResource': {
+                            'type': 'jrxml',
+                            'label': 'sub.jrxml',
+                            'content': Buffer.from(fs.readFileSync('./test/sub.jrxml'),'UTF-8').toString('base64'),
+                        },
+                    },
+                }
+            ],
         });
     });
     

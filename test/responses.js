@@ -72,26 +72,43 @@
         */
         publishReport: function () {
             nock('http://example.com')
-                .put('/jasperserver/rest_v2/resources/Reports/Dummy')
+                .post('/jasperserver/rest_v2/resources/Reports/Dummy')
                 .reply( (uri,requestBody) => {
-                    
-                    
-                    
                     return [
                         200,
                         {
-                          version: 0,
-                          permissionMask: 1,
-                          creationDate: '2019-11-18T21:06:19',
-                          updateDate: '2019-11-18T21:06:19',
-                          label: 'Dummy Report',
-                          uri: '/Reports/Dummy',
-                          dataSource: { dataSourceReference: { uri: '/datasources/Dummy' } },
-                          jrxml: {
-                            jrxmlFileReference: { uri: '/usi_modules/Dummy_files/Main_jrxml' }
-                          },
-                          alwaysPromptControls: false,
-                          controlsLayout: 'popupScreen'
+                            version: 0,
+                            permissionMask: 1,
+                            creationDate: '2019-11-18T21:06:19',
+                            updateDate: '2019-11-18T21:06:19',
+                            label: 'Dummy Report',
+                            uri: '/Reports/Dummy',
+                            dataSource: { dataSourceReference: { uri: '/datasources/Dummy' } },
+                            jrxml: {
+                                jrxmlFileReference: { uri: '/Dummy_files/Main_jrxml' }
+                            },
+                            alwaysPromptControls: false,
+                            controlsLayout: 'popupScreen',
+                            resources: {
+                                "resource": [
+                                    {
+                                        "name": "img.png",
+                                        "file": {
+                                            "fileReference": {
+                                                "uri": "/Dummy_files/img.png"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "sub.jrxml",
+                                        "file": {
+                                            "fileReference": {
+                                                "uri": "/Dummy_files/sub.jrxml"
+                                            }
+                                        }
+                                    },
+                                ]
+                            }
                         }
                     ];
                 });

@@ -1,40 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.10.0.final using JasperReports Library version 6.10.0-unknown  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d1065a37-db08-47cf-ac70-fe2a2111eb66">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dummy" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d1065a37-db08-47cf-ac70-fe2a2111eb66">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="NO_DATA_ADAPTER"/>
 	<queryString>
-		<![CDATA[SELECT 1]]>
+		<![CDATA[]]>
 	</queryString>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="63" splitType="Stretch">
+		<band height="125" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="580" height="60" uuid="878182b4-ea86-41bf-8b7a-15401539a436"/>
+				<reportElement x="0" y="0" width="571" height="60" uuid="878182b4-ea86-41bf-8b7a-15401539a436"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="26"/>
 				</textElement>
 				<text><![CDATA[Dummy Report]]></text>
 			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="64" height="64" uuid="c5cb6c1b-447c-4d0c-82d0-13858a762550">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["repo:img.png"]]></imageExpression>
+			</image>
+			<subreport>
+				<reportElement x="0" y="70" width="571" height="55" uuid="9fc4ef4d-068f-41e5-910f-3c0bc7b5ee42">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["sub.jrxml"]]></subreportExpression>
+			</subreport>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="35" splitType="Stretch"/>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="61" splitType="Stretch"/>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
 	</columnHeader>
 	<detail>
-		<band height="125" splitType="Stretch"/>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
 	</detail>
 	<columnFooter>
-		<band height="45" splitType="Stretch"/>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
 	</columnFooter>
 	<pageFooter>
-		<band height="54" splitType="Stretch"/>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
 	</pageFooter>
 	<summary>
-		<band height="42" splitType="Stretch"/>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
 	</summary>
 </jasperReport>

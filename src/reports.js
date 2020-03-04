@@ -37,33 +37,44 @@
     * @param { String} req.label - Label used to identify the report on the server.
     * @param { String} req.datasource - URI of the datasource to use with the report.
     * @param { String} req.jrxml - Contents of a .jrxml file encoded as Base64.
+    * @param {!Array<Object>} req.resources - Additional resources to be uploaded with the report. (see https://community.jaspersoft.com/documentation/tibco-jasperreports-server-rest-api-reference/v630/resource-descriptors )
     * @returns {Promise<Object>} - Resolves an Axios response (see https://github.com/axios/axios#response-schema ).
     *                            - Rejects an Axios error (see https://github.com/axios/axios#handling-errors ).
-    
     */
     reports.prototype.publish = async function (req,opt) {
         try {
-            return await this.client.request('put','/rest_v2/resources'+req.path, {}, {
-                'version': req.currentVersion,
-                'overwrite': true,
-                'label': req.label,
-                'dataSource': {
-                    'dataSourceReference': {
-                        'uri': req.datasource,
+            return await this.client.request('post','/rest_v2/resources'+req.path,
+                {},
+                Object.assign(
+                    {
+                        'version': req.currentVersion,
+                        'overwrite': true,
+                        'label': req.label,
+                        'dataSource': {
+                            'dataSourceReference': {
+                                'uri': req.datasource,
+                            },
+                        },
+                        'jrxml': {
+                            'jrxmlFile': {
+                                'type': 'jrxml',
+                                'label': 'Main jrxml',
+                                'content': req.jrxml,
+                            },
+                        },
                     },
-                },
-                'jrxml': {
-                    'jrxmlFile': {
-                        'type': 'jrxml',
-                        'label': 'Main jrxml',
-                        'content': req.jrxml,
+                    !Array.isArray(req.resources) || req.resources.length == 0 ? null : {
+                        'resources': {
+                            'resource': req.resources,
+                        },
                     },
-                },
-            }, Object.assign({},opt,{
-                'headers': {
-                    'Content-Type': 'application/repository.reportUnit+json',
-                },
-            }));
+                ),
+                Object.assign({},opt,{
+                    'headers': {
+                        'Content-Type': 'application/repository.reportUnit+json',
+                    },
+                }
+            ));
         }
         catch (err) {
             throw(err);

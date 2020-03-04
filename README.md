@@ -108,6 +108,7 @@ writer.on('error', function (err) {
 @param { String} req.label - Label used to identify the report on the server.
 @param { String} req.datasource - URI of the datasource to use with the report.
 @param { String} req.jrxml - Contents of a .jrxml file encoded as Base64.
+@param {!Array<Object>} req.resources - Additional resources to be uploaded with the report. (see https://community.jaspersoft.com/documentation/tibco-jasperreports-server-rest-api-reference/v630/resource-descriptors )
 @returns {Promise<Object>} - Resolves an Axios response (see https://github.com/axios/axios#response-schema ).
                            - Rejects an Axios error (see https://github.com/axios/axios#handling-errors ).
 ```
