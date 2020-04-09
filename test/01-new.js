@@ -16,7 +16,7 @@ describe('Create new jasperclient object', function () {
     
 });
 
-describe('Authenticate with Jasper server', function () {
+describe('Authenticate with Jasper server using cookie based sessions', function () {
     
     beforeEach( function () {
         responses.login();

@@ -4,6 +4,7 @@
     const axiosCookieJarSupport = require('axios-cookiejar-support').default;
     const tough = require('tough-cookie');
     const qs = require('qs');
+    const Base64 = require('js-base64').Base64;
     
     axiosCookieJarSupport(axios);
     
@@ -17,13 +18,14 @@
     
     /*
     * @class - jasperclient -- Jasper Server REST API client for publishing and running reports.
-    * @param { Object} opt - Required configuration data.
-    * @param { string} opt.proto [http] - Protocol to use; optionally set to https.
-    * @param { string} opt.host - Hostname of the Jasper server.
-    * @param {!number} opt.port - Port number of the server (default is undefined).
-    * @param {!string} opt.path - Path of the server after the hostname (i.e. jasperserver).
-    * @param {!string} opt.username - Username to use when authenticating with the Jasper server.
-    * @param {!string} opt.password - Password to use with the username.
+    * @param { Object}  opt - Required configuration data.
+    * @param { string}  opt.proto [http] - Protocol to use; optionally set to https.
+    * @param { string}  opt.host - Hostname of the Jasper server.
+    * @param {!number}  opt.port - Port number of the server (default is undefined).
+    * @param {!string}  opt.path - Path of the server after the hostname (i.e. jasperserver).
+    * @param {!string}  opt.username - Username to use when authenticating with the Jasper server.
+    * @param {!string}  opt.password - Password to use with the username.
+    * @param {!Boolean} opt.userBasicAuth - Send Basic Authorization header instead of using cookies (default is false)
     */
     function jasperclient (opt) {
         
@@ -39,12 +41,14 @@
         this.username = opt.username;
         this.password = opt.password;
         
+        this.useBasicAuth = opt.useBasicAuth ? true : false;
+        
         if (
             typeof this.proto != 'string'
             || typeof this.host != 'string'
         ) throw new Error('new jasperclient() requires configuration');
         
-        this.cookiejar = new tough.CookieJar();
+        if ( !this.useBasicAuth ) this.cookiejar = new tough.CookieJar();
         
         this.axios = axios.create({
             baseURL: this.baseURL,
@@ -73,6 +77,11 @@
     */
     jasperclient.prototype._request = function (method,path,params,data,opt) {
         return new Promise( (resolve,reject) => {
+            if ( this.useBasicAuth ) {
+                if ( !opt ) opt = {};
+                if ( !opt.headers ) opt.headers = {};
+                if ( !opt.headers.Authorization ) opt.headers.Authorization = 'Basic '+Base64.encode( this.username+':'+this.password );
+            }
             this.axios.request(Object.assign({
                 method: method,
                 url: path,
@@ -125,6 +134,10 @@
     */
     jasperclient.prototype.login = function (opt) {
         return new Promise( (resolve,reject) => {
+            if ( this.useBasicAuth ) {
+                reject('login() disabled when useBasicAuth is enabled');
+                return;
+            }
             this.cookiejar.removeAllCookiesSync();
             this._request('post','/j_spring_security_check', {}, qs.stringify({
                 j_username: opt ? opt.username : this.username,
@@ -160,6 +173,10 @@
     */
     jasperclient.prototype.logout = async function () {
         return new Promise( (resolve,reject) => {
+            if ( this.useBasicAuth ) {
+                reject('logout() disabled when useBasicAuth is enabled');
+                return;
+            }
             this._request('get','/logout.html')
             .then( response => {
                 if ( response.status == 200 ) {
@@ -190,6 +207,18 @@
     jasperclient.prototype.request = function (method,path,params,data,opt) {
         return new Promise( async (resolve,reject) => {
             method = method.toLowerCase();
+            
+            if ( this.useBasicAuth ) {
+                try {
+                    let response = await this._request(method,path,params,data,opt);
+                    resolve(response);
+                    return;
+                }
+                catch (err) {
+                    reject(err);
+                    return;
+                }
+            }
             
             if ( this.cookiejar.getCookiesSync(this.baseURL).length > 0 ) {
                 // already have cookie; attempt request

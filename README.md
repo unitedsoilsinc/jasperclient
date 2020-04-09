@@ -12,6 +12,7 @@ let client = new jasperclient({
     path: 'jasperserver',
     username: 'username',
     password: 'password',
+    useBasicAuth: true,
 });
 
 // Publish a report
@@ -62,14 +63,25 @@ runResponse.data.pipe(writer);
 
 writer.on('finish', function () {
     console.log('Successfully wrote file to ./dummy.pdf');
-    client.logout();
+    // client.logout(); // only useful if useBasicAuth is false
 });
 
 writer.on('error', function (err) {
     console.log('Failed to write file: ',err);
-    client.logout();
+    // client.logout(); // only useful if useBasicAuth is false
 });
 ```
+
+## Constructor
+@class - jasperclient -- Jasper Server REST API client for publishing and running reports.
+@param { Object}  opt - Required configuration data.
+@param { string}  opt.proto [http] - Protocol to use; optionally set to https.
+@param { string}  opt.host - Hostname of the Jasper server.
+@param {!number}  opt.port - Port number of the server (default is undefined).
+@param {!string}  opt.path - Path of the server after the hostname (i.e. jasperserver).
+@param {!string}  opt.username - Username to use when authenticating with the Jasper server.
+@param {!string}  opt.password - Password to use with the username.
+@param {!Boolean} opt.userBasicAuth - Send Basic Authorization header instead of using cookies (default is false)
 
 ## Methods
 
