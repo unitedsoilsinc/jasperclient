@@ -1,5 +1,8 @@
 # jasperclient changes
 
+# 1.2.1 - 2021-01-07
+    - Updated Axios to fix vulnerability
+
 # 1.2.0 - 2020-04-09
     - Added support for basic authorization
 
