@@ -1,5 +1,5 @@
 # jasperclient
-Jasper Server REST API client for publishing and running reports.
+Jasper Server REST v2 API client for publishing and running reports.
 
 ## Usage
 
@@ -73,6 +73,7 @@ writer.on('error', function (err) {
 ```
 
 ## Constructor
+```javascript
 @class - jasperclient -- Jasper Server REST API client for publishing and running reports.
 @param { Object}  opt - Required configuration data.
 @param { string}  opt.proto [http] - Protocol to use; optionally set to https.
@@ -82,6 +83,7 @@ writer.on('error', function (err) {
 @param {!string}  opt.username - Username to use when authenticating with the Jasper server.
 @param {!string}  opt.password - Password to use with the username.
 @param {!Boolean} opt.userBasicAuth - Send Basic Authorization header instead of using cookies (default is false)
+```
 
 ## Methods
 

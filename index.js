@@ -35,8 +35,10 @@
         this.host = opt.host;
         this.port = opt.port;
         this.path = opt.path;
+        if ( typeof this.path != 'string' ) this.path = '';
+        this.path = this.path.replace(/^\/|\/$/g,''); // remove leading/trailing slashes
         
-        this.baseURL = this.proto+'://'+this.host+(this.port?':'+this.port:'')+'/'+(typeof this.path == 'string' ? this.path+'/' : '');
+        this.baseURL = `${this.proto}://${this.host}${this.port?':'+this.port:''}/${this.path != '' ? this.path+'/' : ''}`;
         
         this.username = opt.username;
         this.password = opt.password;
@@ -107,18 +109,23 @@
     
     /*
     * @function matchPath - Perform pattern matching on a path after automatically removing the base path (i.e. /jasperserver).
-    * @param { string} path - Path portion of a URI that may or may not include the base path.
-    * @param { RegExp} pattern - Used to match/capture values from the path.
+    * @param {   string} path - Path portion of a URI that may or may not include the base path.
+    * @param {...RegExp} pattern - Used to match/capture values from the path.
     * @returns {Array|undefined|null} - Results of String.prototype.match() using the provided RegExp or undefined or null if no matches
     */
-    jasperclient.prototype.matchPath = function (path,pattern) {
-        let re = new RegExp('^/'+this.path+'(.*)');
-        let shortPathMatches = path.match(re);
-        if ( !shortPathMatches ) return;
-        let shortPath = shortPathMatches[1];
-        let patternMatches = shortPath.match(pattern);
-        if ( !patternMatches ) return;
-        return patternMatches;
+    jasperclient.prototype.matchPath = function (path,...patterns) {
+        let shortPath = path;
+        if ( this.path != '' ) {
+            let re = new RegExp('^/'+this.path+'(.*)');
+            let shortPathMatches = path.match(re);
+            if ( !shortPathMatches ) return;
+            shortPath = shortPathMatches[1];
+        }
+        for ( let pattern of patterns ) {
+            let patternMatches = shortPath.match(pattern);
+            if ( patternMatches ) return patternMatches;
+        }
+        return;
     };
     
     /*
@@ -154,7 +161,13 @@
                         if ( x.key == 'JSESSIONID' ) return x;
                     },null);
                     
-                    if ( cookie && this.matchPath(response.headers.location,'^\/scripts\/auth\/loginSuccess\.json') ) resolve(cookie.value)
+                    if (
+                        cookie
+                        && this.matchPath(response.headers.location,
+                            '^\/scripts\/auth\/loginSuccess\.json', // v7.x
+                            '^\/scripts\/visualize\/auth\/loginSuccess\.json', // v8.x
+                        )
+                    ) resolve(cookie.value)
                     else reject('Failed to log in');
                 }
                 else {

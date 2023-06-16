@@ -1,5 +1,8 @@
 # jasperclient changes
 
+# 1.2.2 - 2023-06-16
+    - Fixed login fails when connecting to Jasper Server v8.x
+
 # 1.2.1 - 2021-01-07
     - Updated Axios to fix vulnerability
 
