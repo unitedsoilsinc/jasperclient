@@ -3,7 +3,7 @@ const nock = require('nock');
 const fs = require('fs');
 
 const responses = require('./responses.js');
-const jasperclient = require('../index');
+const jasperclient = require('../build/index');
 
 describe('Publish a report', function () {
     

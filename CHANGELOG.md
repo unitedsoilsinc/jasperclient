@@ -1,5 +1,9 @@
 # jasperclient changes
 
+# 2.0.0 - 2023-12-20
+    - Updated dependencies
+    - Began building with TypeScript (changed location of main script)
+
 # 1.2.2 - 2023-06-16
     - Fixed login fails when connecting to Jasper Server v8.x
 

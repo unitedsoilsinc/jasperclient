@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const nock = require('nock');
 
 const responses = require('./responses.js');
-const jasperclient = require('../index');
+const jasperclient = require('../build/index');
 
 describe('Create new jasperclient object', function () {
     

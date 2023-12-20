@@ -1,21 +1,27 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 (() => {
-    
     const axios = require('axios').default;
-    const axiosCookieJarSupport = require('axios-cookiejar-support').default;
+    const axiosCookieJarSupport = require('axios-cookiejar-support').wrapper;
     const tough = require('tough-cookie');
+    const Cookie = tough.Cookie;
     const qs = require('qs');
     const Base64 = require('js-base64').Base64;
-    
-    axiosCookieJarSupport(axios);
-    
     /*
     
     */
     const components = {
-        'resources': require('./src/resources.js'),
-        'reports': require('./src/reports.js'),
+        'resources': require('./resources.js'),
+        'reports': require('./reports.js'),
     };
-    
     /*
     * @class - jasperclient -- Jasper Server REST API client for publishing and running reports.
     * @param { Object}  opt - Required configuration data.
@@ -27,44 +33,36 @@
     * @param {!string}  opt.password - Password to use with the username.
     * @param {!Boolean} opt.userBasicAuth - Send Basic Authorization header instead of using cookies (default is false)
     */
-    function jasperclient (opt) {
-        
-        if ( !opt ) throw new Error('new jasperclient() requires configuration');
-        
+    function jasperclient(opt) {
+        if (!opt)
+            throw new Error('new jasperclient() requires configuration');
         this.proto = opt.proto || 'http';
         this.host = opt.host;
         this.port = opt.port;
         this.path = opt.path;
-        if ( typeof this.path != 'string' ) this.path = '';
-        this.path = this.path.replace(/^\/|\/$/g,''); // remove leading/trailing slashes
-        
-        this.baseURL = `${this.proto}://${this.host}${this.port?':'+this.port:''}/${this.path != '' ? this.path+'/' : ''}`;
-        
+        if (typeof this.path != 'string')
+            this.path = '';
+        this.path = this.path.replace(/^\/|\/$/g, ''); // remove leading/trailing slashes
         this.username = opt.username;
         this.password = opt.password;
-        
         this.useBasicAuth = opt.useBasicAuth ? true : false;
-        
-        if (
-            typeof this.proto != 'string'
-            || typeof this.host != 'string'
-        ) throw new Error('new jasperclient() requires configuration');
-        
-        if ( !this.useBasicAuth ) this.cookiejar = new tough.CookieJar();
-        
-        this.axios = axios.create({
-            baseURL: this.baseURL,
-            headers: {
+        if (typeof this.proto != 'string'
+            || typeof this.host != 'string')
+            throw new Error('new jasperclient() requires configuration');
+        this.baseURL = `${this.proto}://${this.host}${this.port ? ':' + this.port : ''}/${this.path != '' ? this.path + '/' : ''}`;
+        if (!this.useBasicAuth)
+            this.cookiejar = new tough.CookieJar();
+        this.axios = axiosCookieJarSupport(axios.create({
+            'baseURL': this.baseURL,
+            'headers': {
                 'Accept': 'application/json',
             },
-            withCredentials: true,
-            jar: this.cookiejar,
-        });
-        
+            'withCredentials': true,
+            'jar': this.cookiejar,
+        }));
         this.resources = new components.resources(this);
         this.reports = new components.reports(this);
     }
-    
     /*
     * @function _request - perform an HTTP request using Axios
     * @private
@@ -77,27 +75,30 @@
     * @returns {Promise<Object>} - Resolves an Axios response (see https://github.com/axios/axios#response-schema ).
     *                            - Rejects an Axios error (see https://github.com/axios/axios#handling-errors ).
     */
-    jasperclient.prototype._request = function (method,path,params,data,opt) {
-        return new Promise( (resolve,reject) => {
-            if ( this.useBasicAuth ) {
-                if ( !opt ) opt = {};
-                if ( !opt.headers ) opt.headers = {};
-                if ( !opt.headers.Authorization ) opt.headers.Authorization = 'Basic '+Base64.encode( this.username+':'+this.password );
+    jasperclient.prototype._request = function (method, path, params, data, opt) {
+        return new Promise((resolve, reject) => {
+            if (this.useBasicAuth) {
+                if (!opt)
+                    opt = {};
+                if (!opt.headers)
+                    opt.headers = {};
+                if (this.useBasicAuth && !opt.headers.Authorization)
+                    opt.headers.Authorization = 'Basic ' + Base64.encode(this.username + ':' + this.password);
             }
             this.axios.request(Object.assign({
                 method: method,
                 url: path,
                 params: params,
                 data: data,
-            },opt))
-            .then( response => {
+            }, opt))
+                .then(response => {
                 resolve(response);
             })
-            .catch( err => {
-                if ( err.response && err.response.status == 302 ) {
+                .catch(err => {
+                if (err.response && err.response.status == 302) {
                     resolve(err.response);
                 }
-                else if ( err.response ) {
+                else if (err.response) {
                     reject(err);
                 }
                 else {
@@ -106,28 +107,28 @@
             });
         });
     };
-    
     /*
     * @function matchPath - Perform pattern matching on a path after automatically removing the base path (i.e. /jasperserver).
     * @param {   string} path - Path portion of a URI that may or may not include the base path.
     * @param {...RegExp} pattern - Used to match/capture values from the path.
     * @returns {Array|undefined|null} - Results of String.prototype.match() using the provided RegExp or undefined or null if no matches
     */
-    jasperclient.prototype.matchPath = function (path,...patterns) {
+    jasperclient.prototype.matchPath = function (path, ...patterns) {
         let shortPath = path;
-        if ( this.path != '' ) {
-            let re = new RegExp('^/'+this.path+'(.*)');
+        if (this.path != '') {
+            let re = new RegExp('^/' + this.path + '(.*)');
             let shortPathMatches = path.match(re);
-            if ( !shortPathMatches ) return;
+            if (!shortPathMatches)
+                return;
             shortPath = shortPathMatches[1];
         }
-        for ( let pattern of patterns ) {
+        for (let pattern of patterns) {
             let patternMatches = shortPath.match(pattern);
-            if ( patternMatches ) return patternMatches;
+            if (patternMatches)
+                return patternMatches;
         }
         return;
     };
-    
     /*
     * @function login - Create a cookie-based session with the Jasper server.  If the username and password
     *                   were provided to the constructor then they can be ommitted here, and it becomes
@@ -140,70 +141,70 @@
     *                            - Rejects with error string on failure.
     */
     jasperclient.prototype.login = function (opt) {
-        return new Promise( (resolve,reject) => {
-            if ( this.useBasicAuth ) {
+        return new Promise((resolve, reject) => {
+            if (this.useBasicAuth) {
                 reject('login() disabled when useBasicAuth is enabled');
                 return;
             }
             this.cookiejar.removeAllCookiesSync();
-            this._request('post','/j_spring_security_check', {}, qs.stringify({
+            this._request('post', '/j_spring_security_check', {}, qs.stringify({
                 j_username: opt ? opt.username : this.username,
                 j_password: opt ? opt.password : this.password,
-            }),{
+            }), {
                 maxRedirects: 0,
             })
-            .then( response => {
-                
-                if ( response.status == 302 ) {
-                    
-                    let cookie = this.cookiejar.getCookiesSync(this.baseURL).reduce( (obj,x) => {
-                        if ( obj ) return obj;
-                        if ( x.key == 'JSESSIONID' ) return x;
-                    },null);
-                    
-                    if (
-                        cookie
-                        && this.matchPath(response.headers.location,
-                            '^\/scripts\/auth\/loginSuccess\.json', // v7.x
-                            '^\/scripts\/visualize\/auth\/loginSuccess\.json', // v8.x
-                        )
-                    ) resolve(cookie.value)
-                    else reject('Failed to log in');
+                .then((response) => __awaiter(this, void 0, void 0, function* () {
+                if (response.status == 302) {
+                    let header = response.headers['set-cookie'] || [];
+                    for (let str of header) {
+                        let c = Cookie.parse(str);
+                        if (c)
+                            yield this.cookiejar.setCookie(c, this.baseURL);
+                    }
+                    let cookie = this.cookiejar.getCookiesSync(this.baseURL).find(c => c.key == 'JSESSIONID');
+                    if (cookie
+                        && this.matchPath(response.headers.location, '^\/scripts\/auth\/loginSuccess\.json', // v7.x
+                        '^\/scripts\/visualize\/auth\/loginSuccess\.json')) {
+                        resolve(cookie.value);
+                    }
+                    else {
+                        reject('Failed to log in');
+                    }
                 }
                 else {
                     reject('Failed to log in');
                 }
-            })
-            .catch(reject);
+            }))
+                .catch(reject);
         });
     };
-    
     /*
     * @function logout - End the current session with the Jasper server.
     * @async
     * @returns {Promise<Object>} - Resolves an Axios response (see https://github.com/axios/axios#response-schema ).
     *                            - Rejects an Axios error (see https://github.com/axios/axios#handling-errors ).
     */
-    jasperclient.prototype.logout = async function () {
-        return new Promise( (resolve,reject) => {
-            if ( this.useBasicAuth ) {
-                reject('logout() disabled when useBasicAuth is enabled');
-                return;
-            }
-            this._request('get','/logout.html')
-            .then( response => {
-                if ( response.status == 200 ) {
-                    this.cookiejar.removeAllCookiesSync();
-                    resolve(response);
+    jasperclient.prototype.logout = function () {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                if (this.useBasicAuth) {
+                    reject('logout() disabled when useBasicAuth is enabled');
+                    return;
                 }
-                else {
-                    reject(response);
-                }
-            })
-            .catch(reject);
+                this._request('get', '/logout.html')
+                    .then(response => {
+                    if (response.status == 200) {
+                        this.cookiejar.removeAllCookiesSync();
+                        resolve(response);
+                    }
+                    else {
+                        reject(response);
+                    }
+                })
+                    .catch(reject);
+            });
         });
     };
-    
     /*
     * @function request - Send a request to the jasper server.  If a username and password
     *                     were provided to the constructor then a login will be performed
@@ -217,13 +218,12 @@
     * @returns {Promise<Object>} - Resolves an Axios response (see https://github.com/axios/axios#response-schema ).
     *                            - Rejects an Axios error (see https://github.com/axios/axios#handling-errors ).
     */
-    jasperclient.prototype.request = function (method,path,params,data,opt) {
-        return new Promise( async (resolve,reject) => {
+    jasperclient.prototype.request = function (method, path, params, data, opt) {
+        return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
             method = method.toLowerCase();
-            
-            if ( this.useBasicAuth ) {
+            if (this.useBasicAuth) {
                 try {
-                    let response = await this._request(method,path,params,data,opt);
+                    let response = yield this._request(method, path, params, data, opt);
                     resolve(response);
                     return;
                 }
@@ -232,12 +232,11 @@
                     return;
                 }
             }
-            
-            if ( this.cookiejar.getCookiesSync(this.baseURL).length > 0 ) {
+            if (this.cookiejar.getCookiesSync(this.baseURL).length > 0) {
                 // already have cookie; attempt request
                 try {
-                    let response = await this._request(method,path,params,data,opt);
-                    if ( response && response.status != 401 ) {
+                    let response = yield this._request(method, path, params, data, opt);
+                    if (response && response.status != 401) {
                         resolve(response);
                         return;
                     }
@@ -247,22 +246,20 @@
                     return;
                 }
             }
-            
             // request failed; attempt login, then retry original request
             let maxAttempts = 1;
-            let attempt = 1
-            while ( attempt <= maxAttempts ) {
+            let attempt = 1;
+            while (attempt <= maxAttempts) {
                 try {
-                    var jsessionid = await this.login();
+                    var jsessionid = yield this.login();
                 }
                 catch (err) {
                     reject(err);
                     return;
                 }
-                
-                if ( jsessionid  ) {
+                if (jsessionid) {
                     try {
-                        let response = await this._request(method,path,params,data,opt);
+                        let response = yield this._request(method, path, params, data, opt);
                         resolve(response);
                         return;
                     }
@@ -271,15 +268,10 @@
                         return;
                     }
                 }
-                
-                attempt ++;
+                attempt++;
             }
-            
             reject({ error: 'Login failed' });
-            
-        });
+        }));
     };
-    
     module.exports = jasperclient;
-    
 })();
